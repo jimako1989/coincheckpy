@@ -17,6 +17,8 @@ Include the coincheckpy module and create an coincheckpy instance with your acco
 
 **Method names are referred by the part of HTML label name after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api)**
 
+**In the label name, you don't forget to replace all '-'s with '_'.**
+
 
 Examples
 ======
