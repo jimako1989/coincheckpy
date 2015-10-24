@@ -15,7 +15,7 @@ Include the coincheckpy module and create an coincheckpy instance with your acco
 
 	coincheck = coincheckpy.API(environment="live", key="AaBbCc012...", secret_key="123a456...")
 
-**Method names are referred by the part of HTML label names after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api)**
+**Method names are referred by the part of HTML label name after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api)**
 
 
 Examples
