@@ -84,7 +84,7 @@ class EndpointsMixin(object):
         params['address'] = address
         params['amount'] = amount
         endpoint = 'api/send_money'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint,method='POST', params=params)
 
     def account_sends(self, currency, **params):
         """ Get the history of sent money
@@ -108,7 +108,7 @@ class EndpointsMixin(object):
         """
         params['id'] = order_id
         endpoint = 'api/deposit_money/'+str(order_id)+'/fast'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def account_info(self, **params):
         """ Get account info.
@@ -130,7 +130,7 @@ class EndpointsMixin(object):
         Docs: https://coincheck.jp/documents/exchange/api#bank-accounts-create
         """
         endpoint = 'api/bank_accounts'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def bank_accounts_destroy(self, bank_id, **params):
         """ Destroy a bank account
@@ -155,7 +155,7 @@ class EndpointsMixin(object):
         params['currency'] = currency
         params['is_fast'] = is_fast
         endpoint = 'api/withdraws'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def withdraws_destroy(self, withdrawal_id, **params):
         """ Destroy a withdrawal
@@ -173,7 +173,7 @@ class EndpointsMixin(object):
         params['amount'] = amount
         params['currency'] = currency
         endpoint = 'api/lending/borrows'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def read_borrow_matches(self, **params):
         """ Get the list of borrows
@@ -188,7 +188,7 @@ class EndpointsMixin(object):
         """
         params['id'] = repay_id
         endpoint = 'api/lending/borrows/'+str(repay_id)+'/repay'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     """ Lend """
     def create_lend(self, amount, currency, **params):
@@ -198,7 +198,7 @@ class EndpointsMixin(object):
         params['amount'] = amount
         params['currency'] = currency
         endpoint = 'api/lending/lends'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def read_lend(self, **params):
         """ Get the list of lend (=loan)
@@ -213,7 +213,7 @@ class EndpointsMixin(object):
         """
         params['id']=loan_id
         endpoint = 'api/lending/lends/'+str(loan_id)+'/cancel'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def read_lend_matches(self, **params):
         """ Get the list of used lend (=loan)
