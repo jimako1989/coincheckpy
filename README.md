@@ -15,7 +15,7 @@ Include the coincheckpy module and create an coincheckpy instance with your acco
 
 	coincheck = coincheckpy.API(environment="live", key="AaBbCc012...", secret_key="123a456...")
 
-**Method names are referred by the part of HTML label name after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api)**
+**Method names are referred by the part of HTML label name after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api).**
 
 **In the label name, you don't forget to replace all '-'s with '_'.**
 
@@ -23,14 +23,18 @@ Include the coincheckpy module and create an coincheckpy instance with your acco
 Examples
 ======
 
-### Get BTC price now
+### Get latest BTC price
 	coincheck.ticker()
 
-### Get order book
+### Get an order book
     coincheck.order_book()
 
-### Get your balance
+### Make sure my balance
     coincheck.account_balance()
+
+### Publish a new order to exchange
+For example if you'd like buy 0.001 BTC as 28000 JPY/BTC, you need to specify following parameters.
+	coincheck.order_new(pair="btc_jpy",order_type="buy",rate=28000,amount=0.001)
 
 BTC Price Streaming
 ======
