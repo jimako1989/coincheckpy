@@ -34,6 +34,7 @@ Examples
 
 ### Publish a new order to exchange
 For example if you'd like buy 0.001 BTC as 28000 JPY/BTC, you need to specify following parameters.
+
 	coincheck.order_new(pair="btc_jpy",order_type="buy",rate=28000,amount=0.001)
 
 BTC Price Streaming
