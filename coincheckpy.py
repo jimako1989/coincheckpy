@@ -9,7 +9,6 @@ LICENSE: MIT
 
 import json,time,hmac,hashlib,requests
 
-
 """EndpointsMixin provides a mixin for the API instance """
 class EndpointsMixin(object):
 
@@ -45,7 +44,7 @@ class EndpointsMixin(object):
         params['pair'] = pair
         params['order_type'] = order_type
         endpoint = 'api/exchange/orders'
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='POST', params=params)
 
     def order_opens(self, **params):
         """ Get open orders
@@ -60,7 +59,7 @@ class EndpointsMixin(object):
         """
         params['id'] = order_id
         endpoint = 'api/exchange/orders/'+str(order_id)
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='DELETE', params=params)
 
     def order_transactions(self, **params):
         """ Get my transactions
@@ -137,7 +136,7 @@ class EndpointsMixin(object):
         Docs: https://coincheck.jp/documents/exchange/api#bank-accounts-destroy
         """
         endpoint = 'api/bank_accounts/'+str(bank_id)
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='DELETE', params=params)
 
     def withdraws(self, **params):
         """ Get the history of withdraws
@@ -163,7 +162,7 @@ class EndpointsMixin(object):
         """
         params['id'] = withdrawal_id
         endpoint = 'api/withdraws'+str(withdrawal_id)
-        return self.request(endpoint, params=params)
+        return self.request(endpoint, method='DELETE', params=params)
 
     """ Borrow """
     def create_borrow(self, amount, currency, **params):
@@ -241,7 +240,6 @@ class API(EndpointsMixin, object):
 
         self.client = requests.Session()
 
-
     def request(self, endpoint, method='GET', auth=True, params=None):
         """ Returns dict of response from Coincheck's open API """
 
@@ -252,34 +250,48 @@ class API(EndpointsMixin, object):
         method = method.lower()
         params = params or {}
 
+        if 'amount' in params:
+            params['amount'] = str(params['amount'])
+        if 'rate' in params:
+            params['rate'] = str(params['rate'])
+
         func = getattr(self.client, method)
 
+        request_args['headers'] = {}
         if method == 'get':
             request_args['headers'] = params
-        else:
-            request_args['data'] = params
-
-        url_endpoint = ""
-        if type(params) is dict:
-            url_endpoint = "?"
-        for tup in params.items():
-            url_endpoint += str(tup[0]) + "=" + str(tup[1]) + "&"
-        url += url_endpoint[:-1]
+            if type(params) is dict:
+                url_endpoint = "?"
+            for (key, value) in params.items():
+                url_endpoint += str(key) + "=" + str(value) + "&"
+            url += url_endpoint[:-1]
+        elif method == 'post':
+            if type(params) is dict:
+                url_endpoint = "?"
+            for (key, value) in params.items():
+                url_endpoint += str(key) + "=" + str(value) + "&"
+            url += url_endpoint[:-1]
+            request_args['headers'] = params
+        elif method == 'delete':
+            request_args['headers'] = params
 
         if auth:
-            message = (self.nonce + url).encode('utf-8')
+            message = (self.nonce + url).encode('ascii')
             signature = hmac.new(self.secret_key, msg=message, digestmod=hashlib.sha256).hexdigest()
-
-            headers = {"ACCESS-KEY":self.key,"ACCESS-NONCE":self.nonce,"ACCESS-SIGNATURE":signature}
+            headers = {
+                "Content-Type":"application/json",\
+                "ACCESS-KEY":self.key,\
+                "ACCESS-NONCE":self.nonce,\
+                "ACCESS-SIGNATURE":signature
+            }
             request_args['headers'].update(headers)
 
         try:
             response = func(url, **request_args)
         except requests.RequestException as e:
             print (str(e))
-        content = response.content.decode('utf-8')
 
-        content = json.loads(content)
+        content = response.json()
 
         # error message
         if response.status_code >= 400:
