@@ -17,13 +17,13 @@ Include the coincheckpy module and create an coincheckpy instance with your acco
 
 **Method names are referred by the part of HTML label name after #, which you can see [Coincheck API web page](https://coincheck.jp/documents/exchange/api).**
 
-**In the label name, you don't forget to replace all '-'s with '_'.**
+**In the label name, you don't forget to replace all '-'s with '_'.** (e.g. order-opens -> order_opens)
 
 
 Examples
 ======
 
-### Get latest BTC price
+### Get the latest BTC price
 	coincheck.ticker()
 
 ### Get an order book
