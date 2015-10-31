@@ -7,7 +7,8 @@ GITHUB: github.com/jimako1989/coincheckpy
 LICENSE: MIT
 """
 
-import json,time,hmac,hashlib,requests
+import json,time,hmac,hashlib,requests,datetime
+import pandas as pd
 
 """EndpointsMixin provides a mixin for the API instance """
 class EndpointsMixin(object):
@@ -221,6 +222,14 @@ class EndpointsMixin(object):
         endpoint = 'api/lending/lends/matches'
         return self.request(endpoint, params=params)
 
+    """ Get the historical prices of JPY/BTC """
+    def get_prices(self, term):
+        response = requests.get("https://coincheck.jp/exchange/chart.json?line=true&term="+str(term)).json()['chart']
+        datetimeIndex = [pd.Timestamp(datetime.datetime.fromtimestamp(r[0]/1000.0)) for r in response]
+        rates = [int(r[1]) for r in response]
+        series = pd.Series(rates, index=datetimeIndex)
+        return(series)
+
 
 """ Provides functionality for access to core COINCHECK API calls """
 
@@ -235,7 +244,7 @@ class API(EndpointsMixin, object):
             pass
 
         self.key = key
-        self.secret_key = secret_key.encode('utf-8')
+        self.secret_key = secret_key.encode('ascii')
         self.nonce = str(int(time.time()))
 
         self.client = requests.Session()
@@ -255,11 +264,8 @@ class API(EndpointsMixin, object):
         if 'rate' in params:
             params['rate'] = str(params['rate'])
 
-        func = getattr(self.client, method)
-
-        request_args['headers'] = {}
+        request_args['headers'] = params
         if method == 'get':
-            request_args['headers'] = params
             if type(params) is dict:
                 url_endpoint = "?"
             for (key, value) in params.items():
@@ -271,9 +277,8 @@ class API(EndpointsMixin, object):
             for (key, value) in params.items():
                 url_endpoint += str(key) + "=" + str(value) + "&"
             url += url_endpoint[:-1]
-            request_args['headers'] = params
         elif method == 'delete':
-            request_args['headers'] = params
+            pass
 
         if auth:
             message = (self.nonce + url).encode('ascii')
@@ -286,6 +291,7 @@ class API(EndpointsMixin, object):
             }
             request_args['headers'].update(headers)
 
+        func = getattr(self.client, method)
         try:
             response = func(url, **request_args)
         except requests.RequestException as e:
@@ -328,7 +334,7 @@ class Streamer():
 
         while self.connected:
             response = self.client.get(self.api_url, **request_args)
-            content = response.content.decode('utf-8')
+            content = response.content.decode('ascii')
             content = json.loads(content)
 
             if response.status_code != 200:
