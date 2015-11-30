@@ -244,13 +244,14 @@ class API(EndpointsMixin, object):
             pass
 
         self.key = key
-        self.secret_key = secret_key.encode('ascii')
-        self.nonce = str(int(time.time()))
+        self.secret_key = bytes(secret_key, 'ascii') #secret_key.encode('ascii')
 
         self.client = requests.Session()
 
     def request(self, endpoint, method='GET', auth=True, params=None):
         """ Returns dict of response from Coincheck's open API """
+
+        self.nonce = str(int(time.time() * 10000))
 
         url = '%s/%s' % ( self.api_url, endpoint)
 
@@ -265,13 +266,7 @@ class API(EndpointsMixin, object):
             params['rate'] = str(params['rate'])
 
         request_args['headers'] = params
-        if method == 'get':
-            if type(params) is dict:
-                url_endpoint = "?"
-            for (key, value) in params.items():
-                url_endpoint += str(key) + "=" + str(value) + "&"
-            url += url_endpoint[:-1]
-        elif method == 'post':
+        if method == 'get' or method == 'post':
             if type(params) is dict:
                 url_endpoint = "?"
             for (key, value) in params.items():
@@ -281,7 +276,7 @@ class API(EndpointsMixin, object):
             pass
 
         if auth:
-            message = (self.nonce + url).encode('ascii')
+            message = bytes(self.nonce + url, 'ascii')
             signature = hmac.new(self.secret_key, msg=message, digestmod=hashlib.sha256).hexdigest()
             headers = {
                 "Content-Type":"application/json",\
@@ -339,10 +334,6 @@ class Streamer():
 
             if response.status_code != 200:
                 self.on_error(content)
-
-            if any([content[key] != content_[key] for key in ['last', 'bid', 'volume', 'ask', 'low', 'high']]):
-                self.on_success(content)
-                content_ = content
 
             time.sleep(self.heartbeat)
 

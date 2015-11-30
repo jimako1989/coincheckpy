@@ -29,7 +29,7 @@ Examples
 ### Get an order book
     coincheck.order_book()
 
-### Make sure my balance
+### Make sure your balance
     coincheck.account_balance()
 
 ### Publish a new order to exchange
@@ -38,7 +38,7 @@ For example, if you'd like to buy 0.001 BTC as 28000 JPY/BTC, you need to specif
 	coincheck.order_new(pair="btc_jpy",order_type="buy",rate=28000,amount=0.001)
 
 ### Get the historical prices of JPY/BTC
-If you'd like to get the historical prices, you can set three parameters, '10_minutes', '1_hour' and '1_day'.
+If you'd like to get the historical prices, you can set a parameter chosen of three, '10_minutes', '1_hour' and '1_day'.
 It returns an useful pandas series object.
 
 	coincheck.get_prices('10_minutes')
