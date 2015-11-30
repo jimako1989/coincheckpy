@@ -335,6 +335,8 @@ class Streamer():
             if response.status_code != 200:
                 self.on_error(content)
 
+            self.on_success(content)
+
             time.sleep(self.heartbeat)
 
     def on_success(self, content):
