@@ -9,6 +9,8 @@ LICENSE: MIT
 
 import json,time,hmac,hashlib,requests,datetime
 import pandas as pd
+from decimal import *
+getcontext().prec = 8
 
 """EndpointsMixin provides a mixin for the API instance """
 class EndpointsMixin(object):
@@ -230,6 +232,10 @@ class EndpointsMixin(object):
         series = pd.Series(rates, index=datetimeIndex)
         return(series)
 
+    """ Get the depth of BTC trading """
+    def get_depth(self):
+        response = requests.get("https://coincheck.jp/exchange/depth_chart.json").json()['chart']
+        return(response['buy'], response['sell'])
 
 """ Provides functionality for access to core COINCHECK API calls """
 
