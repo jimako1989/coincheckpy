@@ -46,6 +46,16 @@ class EndpointsMixin(object):
         """
         params['pair'] = pair
         params['order_type'] = order_type
+
+        if (order_type == "buy" or order_type == "sell") and 'rate' not in params and 'amount' not in params:
+            raise InputError(['rate', 'amount'], order_type)
+        if order_type == "market_buy" and 'market_buy_amount' not in params:
+            raise InputError('market_buy_amount', order_type)
+        if (order_type == "market_sell" or order_type == "leverage_buy" or order_type == "leverage_sell") and 'amount' not in params:
+            raise InputError('amount', order_type)
+        if (order_type == "close_long" or order_type == "close_short") and 'amount' not in params and 'positions' not in params:
+            raise InputError(['amount', 'positions'], order_type)
+
         endpoint = 'api/exchange/orders'
         return self.request(endpoint, method='POST', params=params)
 
@@ -65,18 +75,32 @@ class EndpointsMixin(object):
         return self.request(endpoint, method='DELETE', params=params)
 
     def order_transactions(self, **params):
-        """ Get my transactions
+        """ Get your transactions
         Docs: https://coincheck.jp/documents/exchange/api#order-transactions
         """
         endpoint = 'api/exchange/orders/transactions'
         return self.request(endpoint, params=params)
 
+    def order_positions(self, **params):
+        """ Get your leverage position list
+        Docs: https://coincheck.jp/documents/exchange/api#order-positions
+        """
+        endpoint = '/api/exchange/leverage/positions'
+        return self.request(endpoint, params=params)
+
     """ Account """
     def account_balance(self, **params):
-        """ Check the balance
+        """ Check your balance
         Docs: https://coincheck.jp/documents/exchange/api#account-balance
         """
         endpoint = 'api/accounts/balance'
+        return self.request(endpoint, params=params)
+
+    def account_leverage_balance(self, **params):
+        """ Check your leverage balance
+        Docs: https://coincheck.jp/documents/exchange/api#account-leverage-balance
+        """
+        endpoint = 'api/accounts/leverage_balance'
         return self.request(endpoint, params=params)
 
     def account_sendmoney(self, address, amount, **params):
@@ -192,37 +216,24 @@ class EndpointsMixin(object):
         endpoint = 'api/lending/borrows/'+str(repay_id)+'/repay'
         return self.request(endpoint, method='POST', params=params)
 
-    """ Lend """
-    def create_lend(self, amount, currency, **params):
-        """ Create lend (=loan)
-        Docs: https://coincheck.jp/documents/exchange/api#create-lend
+    """ Transfer """
+    def transfers_to_leverage(self, amount, currency, **params):
+        """ Transfers to your leverage account from your spot account.
+        Docs: https://coincheck.jp/documents/exchange/api#transfers-to-leverage
         """
         params['amount'] = amount
         params['currency'] = currency
-        endpoint = 'api/lending/lends'
+        endpoint = 'api/exchange/transfers/to_leverage'
         return self.request(endpoint, method='POST', params=params)
 
-    def read_lend(self, **params):
-        """ Get the list of lend (=loan)
-        Docs: https://coincheck.jp/documents/exchange/api#read-lend
+    def transfers_from_leverage(self, amount, currency, **params):
+        """ Transfers to your spot account from your leverage account.
+        Docs: https://coincheck.jp/documents/exchange/api#transfers-from-leverage
         """
-        endpoint = 'api/lending/lends'
-        return self.request(endpoint, params=params)
-
-    def cancel_lend(self, loan_id, **params):
-        """ Cancel a lend (=loan)
-        Docs: https://coincheck.jp/documents/exchange/api#cancel-lend
-        """
-        params['id']=loan_id
-        endpoint = 'api/lending/lends/'+str(loan_id)+'/cancel'
+        params['amount'] = amount
+        params['currency'] = currency
+        endpoint = 'api/exchange/transfers/from_leverage'
         return self.request(endpoint, method='POST', params=params)
-
-    def read_lend_matches(self, **params):
-        """ Get the list of used lend (=loan)
-        Docs: https://coincheck.jp/documents/exchange/api#read-lend-matches
-        """
-        endpoint = 'api/lending/lends/matches'
-        return self.request(endpoint, params=params)
 
     """ Get the historical prices of JPY/BTC """
     def get_prices(self, term):
@@ -250,7 +261,7 @@ class API(EndpointsMixin, object):
             pass
 
         self.key = key
-        self.secret_key = bytes(secret_key, 'ascii') #secret_key.encode('ascii')
+        self.secret_key = bytes(secret_key, 'ascii')
 
         self.client = requests.Session()
 
@@ -367,3 +378,14 @@ class CoincheckError(Exception):
         msg = "COINCHECK API returned error code %s (%s) " % (status_code, error_response['error'])
 
         super(CoincheckError, self).__init__(msg)
+
+""" Parameter input exception """
+class InputError(Exception):
+    def __init__(self, must_parameters, order_type):
+        self.must_parameters = must_parameters
+        self.order_type = order_type
+    def __str__(self):
+        if type(must_parameters) == str:
+            return "Parameter: %s is needed if the order type is %s."%(must_parameters, order_type)
+        elif type(must_parameters) == list:
+            return "Parameters: %s are needed if the order type is %s."%(str(must_parameters), order_type)
