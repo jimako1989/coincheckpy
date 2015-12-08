@@ -85,8 +85,8 @@ class EndpointsMixin(object):
         """ Get your leverage position list
         Docs: https://coincheck.jp/documents/exchange/api#order-positions
         """
-        endpoint = '/api/exchange/leverage/positions'
-        return self.request(endpoint, params=params)
+        endpoint = 'api/exchange/leverage/positions'
+        return self.request(endpoint ,params=params)
 
     """ Account """
     def account_balance(self, **params):
