@@ -18,31 +18,49 @@ class EndpointsMixin(object):
     """Public API"""
     def ticker(self, **params):
         """ Get a tick
-        Docs: https://coincheck.jp/documents/exchange/api#ticker
+        Docs: https://coincheck.com/documents/exchange/api#ticker
         """
         endpoint = 'api/ticker'
         return self.request(endpoint, auth=False, params=params)
 
     def public_trades(self, **params):
         """ Get public trades
-        Docs: https://coincheck.jp/documents/exchange/api#public-trades
+        Docs: https://coincheck.com/documents/exchange/api#public-trades
         """
         endpoint = 'api/trades'
         return self.request(endpoint, auth=False, params=params)
 
     def order_book(self, **params):
         """ Get order books
-        Docs: https://coincheck.jp/documents/exchange/api#order-book
+        Docs: https://coincheck.com/documents/exchange/api#order-book
         """
         endpoint = 'api/order_books'
         return self.request(endpoint, auth=False, params=params)
 
+    def order_rate(self, order_type, pair, **params):
+        """ Get order rate
+        Docs: https://coincheck.com/documents/exchange/api#order-rate
+        """
+        params['order_type'] = order_type
+        params['pair'] = pair
+
+        endpoint = 'api/exchange/orders/rate'
+        return self.request(endpoint, auth=False, params=params)
+
+    def buy_rate(self, pair, **params):
+        """ Get buy rate
+        Docs: https://coincheck.com/documents/exchange/api#buy-rate
+        """
+        params['pair'] = pair
+
+        endpoint = 'api/rate/' + pair
+        return self.request(endpoint, auth=False, params=params)        
 
     """ Private API """
     """ Order """
     def order_new(self, pair, order_type, **params):
         """ Create a new order
-        Docs: https://coincheck.jp/documents/exchange/api#order-new
+        Docs: https://coincheck.com/documents/exchange/api#order-new
         """
         params['pair'] = pair
         params['order_type'] = order_type
@@ -61,14 +79,14 @@ class EndpointsMixin(object):
 
     def order_opens(self, **params):
         """ Get open orders
-        Docs: https://coincheck.jp/documents/exchange/api#order-opens
+        Docs: https://coincheck.com/documents/exchange/api#order-opens
         """
         endpoint = 'api/exchange/orders/opens'
         return self.request(endpoint, params=params)
 
     def order_cancel(self, order_id, **params):
         """ Cancel an order
-        Docs: https://coincheck.jp/documents/exchange/api#order-cancel
+        Docs: https://coincheck.com/documents/exchange/api#order-cancel
         """
         params['id'] = order_id
         endpoint = 'api/exchange/orders/'+str(order_id)
@@ -76,14 +94,14 @@ class EndpointsMixin(object):
 
     def order_transactions(self, **params):
         """ Get your transactions
-        Docs: https://coincheck.jp/documents/exchange/api#order-transactions
+        Docs: https://coincheck.com/documents/exchange/api#order-transactions
         """
         endpoint = 'api/exchange/orders/transactions'
         return self.request(endpoint, params=params)
 
     def order_positions(self, **params):
         """ Get your leverage position list
-        Docs: https://coincheck.jp/documents/exchange/api#order-positions
+        Docs: https://coincheck.com/documents/exchange/api#order-positions
         """
         endpoint = 'api/exchange/leverage/positions'
         return self.request(endpoint ,params=params)
@@ -91,21 +109,21 @@ class EndpointsMixin(object):
     """ Account """
     def account_balance(self, **params):
         """ Check your balance
-        Docs: https://coincheck.jp/documents/exchange/api#account-balance
+        Docs: https://coincheck.com/documents/exchange/api#account-balance
         """
         endpoint = 'api/accounts/balance'
         return self.request(endpoint, params=params)
 
     def account_leverage_balance(self, **params):
         """ Check your leverage balance
-        Docs: https://coincheck.jp/documents/exchange/api#account-leverage-balance
+        Docs: https://coincheck.com/documents/exchange/api#account-leverage-balance
         """
         endpoint = 'api/accounts/leverage_balance'
         return self.request(endpoint, params=params)
 
     def account_sendmoney(self, address, amount, **params):
         """ Send money
-        Docs: https://coincheck.jp/documents/exchange/api#account-sendmoney
+        Docs: https://coincheck.com/documents/exchange/api#account-sendmoney
         """
         params['address'] = address
         params['amount'] = amount
@@ -114,7 +132,7 @@ class EndpointsMixin(object):
 
     def account_sends(self, currency, **params):
         """ Get the history of sent money
-        Docs: https://coincheck.jp/documents/exchange/api#account-sends
+        Docs: https://coincheck.com/documents/exchange/api#account-sends
         """
         params['currency'] = currency
         endpoint = 'api/send_money'
@@ -122,7 +140,7 @@ class EndpointsMixin(object):
 
     def account_deposits(self, currency, **params):
         """ Get the history of deposit money
-        Docs: https://coincheck.jp/documents/exchange/api#account-deposits
+        Docs: https://coincheck.com/documents/exchange/api#account-deposits
         """
         params['currency'] = currency
         endpoint = 'api/deposit_money'
@@ -130,7 +148,7 @@ class EndpointsMixin(object):
 
     def account_deposits_fast(self, order_id, **params):
         """ Fast withdrawal
-        Docs: https://coincheck.jp/documents/exchange/api#account-deposits-fast
+        Docs: https://coincheck.com/documents/exchange/api#account-deposits-fast
         """
         params['id'] = order_id
         endpoint = 'api/deposit_money/'+str(order_id)+'/fast'
@@ -138,7 +156,7 @@ class EndpointsMixin(object):
 
     def account_info(self, **params):
         """ Get account info.
-        Docs: https://coincheck.jp/documents/exchange/api#account-info
+        Docs: https://coincheck.com/documents/exchange/api#account-info
         """
         endpoint = 'api/accounts'
         return self.request(endpoint, params=params)
@@ -146,35 +164,35 @@ class EndpointsMixin(object):
     """ Withdrawal """
     def bank_accounts(self, **params):
         """ Get bank accounts
-        Docs: https://coincheck.jp/documents/exchange/api#bank-accounts
+        Docs: https://coincheck.com/documents/exchange/api#bank-accounts
         """
         endpoint = 'api/bank_accounts'
         return self.request(endpoint, params=params)
 
     def bank_accounts_create(self, bank_name, branch_name, bank_account_type, number, name, **params):
         """ Create a bank account
-        Docs: https://coincheck.jp/documents/exchange/api#bank-accounts-create
+        Docs: https://coincheck.com/documents/exchange/api#bank-accounts-create
         """
         endpoint = 'api/bank_accounts'
         return self.request(endpoint, method='POST', params=params)
 
     def bank_accounts_destroy(self, bank_id, **params):
         """ Destroy a bank account
-        Docs: https://coincheck.jp/documents/exchange/api#bank-accounts-destroy
+        Docs: https://coincheck.com/documents/exchange/api#bank-accounts-destroy
         """
         endpoint = 'api/bank_accounts/'+str(bank_id)
         return self.request(endpoint, method='DELETE', params=params)
 
     def withdraws(self, **params):
         """ Get the history of withdraws
-        Docs: https://coincheck.jp/documents/exchange/api#withdraws
+        Docs: https://coincheck.com/documents/exchange/api#withdraws
         """
         endpoint = 'api/withdraws'
         return self.request(endpoint, params=params)
 
     def withdraws_create(self, bank_account_id, amount, currency, is_fast=False, **params):
         """ Apply the withdrawal
-        Docs: https://coincheck.jp/documents/exchange/api#withdraws-create
+        Docs: https://coincheck.com/documents/exchange/api#withdraws-create
         """
         params['bank_account_id'] = bank_account_id
         params['amount'] = amount
@@ -185,7 +203,7 @@ class EndpointsMixin(object):
 
     def withdraws_destroy(self, withdrawal_id, **params):
         """ Destroy a withdrawal
-        Docs: https://coincheck.jp/documents/exchange/api#withdraws-destroy
+        Docs: https://coincheck.com/documents/exchange/api#withdraws-destroy
         """
         params['id'] = withdrawal_id
         endpoint = 'api/withdraws'+str(withdrawal_id)
@@ -194,7 +212,7 @@ class EndpointsMixin(object):
     """ Borrow """
     def create_borrow(self, amount, currency, **params):
         """ Create a borrow
-        Docs: https://coincheck.jp/documents/exchange/api#create-borrow
+        Docs: https://coincheck.com/documents/exchange/api#create-borrow
         """
         params['amount'] = amount
         params['currency'] = currency
@@ -203,14 +221,14 @@ class EndpointsMixin(object):
 
     def read_borrow_matches(self, **params):
         """ Get the list of borrows
-        Docs: https://coincheck.jp/documents/exchange/api#read-borrow-matches
+        Docs: https://coincheck.com/documents/exchange/api#read-borrow-matches
         """
         endpoint = 'api/lending/borrows/matches'
         return self.request(endpoint, params=params)
 
     def create_repay(self, repay_id, **params):
         """ Repayment
-        Docs: https://coincheck.jp/documents/exchange/api#create-repay
+        Docs: https://coincheck.com/documents/exchange/api#create-repay
         """
         params['id'] = repay_id
         endpoint = 'api/lending/borrows/'+str(repay_id)+'/repay'
@@ -219,7 +237,7 @@ class EndpointsMixin(object):
     """ Transfer """
     def transfers_to_leverage(self, amount, currency, **params):
         """ Transfers to your leverage account from your spot account.
-        Docs: https://coincheck.jp/documents/exchange/api#transfers-to-leverage
+        Docs: https://coincheck.com/documents/exchange/api#transfers-to-leverage
         """
         params['amount'] = amount
         params['currency'] = currency
@@ -228,7 +246,7 @@ class EndpointsMixin(object):
 
     def transfers_from_leverage(self, amount, currency, **params):
         """ Transfers to your spot account from your leverage account.
-        Docs: https://coincheck.jp/documents/exchange/api#transfers-from-leverage
+        Docs: https://coincheck.com/documents/exchange/api#transfers-from-leverage
         """
         params['amount'] = amount
         params['currency'] = currency
@@ -237,7 +255,7 @@ class EndpointsMixin(object):
 
     """ Get the historical prices of JPY/BTC """
     def get_prices(self, term):
-        response = requests.get("https://coincheck.jp/exchange/chart.json?line=true&term="+str(term)).json()['chart']
+        response = requests.get("https://coincheck.com/exchange/chart.json?line=true&term="+str(term)).json()['chart']
         datetimeIndex = [pd.Timestamp(datetime.datetime.fromtimestamp(r[0]/1000.0)) for r in response]
         rates = [int(r[1]) for r in response]
         series = pd.Series(rates, index=datetimeIndex)
@@ -245,7 +263,7 @@ class EndpointsMixin(object):
 
     """ Get the depth of BTC trading """
     def get_depth(self):
-        response = requests.get("https://coincheck.jp/exchange/depth_chart.json").json()['chart']
+        response = requests.get("https://coincheck.com/exchange/depth_chart.json").json()['chart']
         return(response['buy'], response['sell'])
 
 """ Provides functionality for access to core COINCHECK API calls """
@@ -255,7 +273,7 @@ class API(EndpointsMixin, object):
         """ Instantiates an instance of CoincheckPy's API wrapper """
 
         if environment == 'live':
-            self.api_url = 'https://coincheck.jp'
+            self.api_url = 'https://coincheck.com'
         else:
             # for future, access to a demo account.
             pass
@@ -326,7 +344,7 @@ class Streamer():
         """ Instantiates an instance of CoincheckPy's streaming API wrapper. """
 
         if environment == 'live':
-            self.api_url = 'https://coincheck.jp/api/ticker'
+            self.api_url = 'https://coincheck.com/api/ticker'
         else:
             # for future, access to a demo account.
             pass
